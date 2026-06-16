@@ -1,13 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
 
-// ── API ───────────────────────────────────────────────────────────────────────
+// ── API (routed through Vercel proxy — key stays server-side) ────────────────
 async function callClaude(prompt, system) {
-  const res = await fetch("https://api.anthropic.com/v1/messages", {
+  const res = await fetch("/api/claude", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "anthropic-dangerous-direct-browser-access": "true",
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       model: "claude-sonnet-4-6",
       max_tokens: 2000,
@@ -19,8 +16,7 @@ async function callClaude(prompt, system) {
   if (!res.ok || data.type === "error") {
     throw new Error(data?.error?.message || `API error ${res.status}`);
   }
-  const text = data.content?.map((b) => b.text || "").join("") || "";
-  return text;
+  return data.content?.map((b) => b.text || "").join("") || "";
 }
 
 function parseJSON(raw) {
